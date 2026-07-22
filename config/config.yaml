@@ -1,0 +1,56 @@
+# AQI-Fusion Configuration File
+
+project:
+  name: "AQI-Fusion"
+  version: "1.0.0"
+  description: "Multi-Source Explainable AQI Forecasting & Spatial Estimation System"
+
+pilot_cities:
+  delhi_ncr:
+    name: "Delhi-NCR"
+    bbox: [76.84, 28.38, 77.38, 28.88] # [min_lon, min_lat, max_lon, max_lat]
+    center: [28.6139, 77.2090]
+  hyderabad:
+    name: "Hyderabad"
+    bbox: [78.25, 17.20, 78.65, 17.60]
+    center: [17.3850, 78.4867]
+  mumbai:
+    name: "Mumbai"
+    bbox: [72.75, 18.85, 73.10, 19.30]
+    center: [19.0760, 72.8777]
+
+api_endpoints:
+  openaq: "https://api.openaq.org/v2"
+  waqi: "https://api.waqi.info"
+  cpcb_datagov: "https://api.data.gov.in/resource/3b47a077-380c-4204-b995-65210759f7d3"
+  openweather: "https://api.openweathermap.org/data/2.5"
+
+api_keys:
+  waqi_token: "DEMO_TOKEN" # Replace with user token
+  openweather_key: ""
+  cpcb_datagov_key: ""
+
+pollutants:
+  - PM2.5
+  - PM10
+  - NO2
+  - SO2
+  - CO
+  - O3
+
+meteorological_variables:
+  - temp
+  - humidity
+  - wind_speed
+  - wind_deg
+  - pressure
+
+satellite:
+  modis_collection: "MODIS/061/MOD04_L2"
+  sentinel5p_ai_collection: "COPERNICUS/S5P/OFFL/L3_AER_AI"
+  sentinel5p_no2_collection: "COPERNICUS/S5P/OFFL/L3_NO2"
+  cloud_cover_max: 0.30
+
+schema:
+  temporal_resolution: "1h"
+  spatial_grid_km: 1.0
