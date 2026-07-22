@@ -11,19 +11,19 @@ aqi_fusion/
 │   └── schemas.py                # Pydantic v2 data models for spatio-temporal alignment
 ├── src/
 │   ├── data_ingestion/
-│   │   ├── openaq_client.py       # OpenAQ API v2 connector (Member A)
-│   │   ├── waqi_client.py         # WAQI API connector (Member A)
-│   │   ├── cpcb_client.py         # CPCB / data.gov.in connector (Member A)
-│   │   ├── weather_client.py      # OpenWeatherMap connector (Member A)
-│   │   ├── kaggle_loader.py       # Historical benchmark CSV loader (Member A)
-│   │   └── gee_aod.py             # NASA Earthdata & GEE satellite AOD connector (Member B)
+│   │   ├── openaq_client.py       # OpenAQ API v2 connector 
+│   │   ├── waqi_client.py         # WAQI API connector 
+│   │   ├── cpcb_client.py         # CPCB / data.gov.in connector 
+│   │   ├── weather_client.py      # OpenWeatherMap connector
+│   │   ├── kaggle_loader.py       # Historical benchmark CSV loader
+│   │   └── gee_aod.py             # NASA Earthdata & GEE satellite AOD connector 
 │   ├── data_preprocessing/
-│   │   ├── ground_cleaning.py     # Outlier filtering, hourly resampling & KNN imputation (Member A)
-│   │   └── satellite_preprocessing.py # Cloud masking, spatial alignment & IDW interpolation (Member B)
+│   │   ├── ground_cleaning.py     # Outlier filtering, hourly resampling & KNN imputation 
+│   │   └── satellite_preprocessing.py # Cloud masking, spatial alignment & IDW interpolation 
 │   ├── pipeline/
-│   │   └── run_etl.py             # Master ETL orchestrator (Both Members)
+│   │   └── run_etl.py             # Master ETL orchestrator 
 │   └── utils/
-│       └── geo_utils.py           # Bounding box filter, grid generator, Haversine dist (Member B)
+│       └── geo_utils.py           # Bounding box filter, grid generator, Haversine dist 
 ├── tests/
 │   ├── test_schemas.py            # Schema validation test suite
 │   ├── test_geo_utils.py          # Geospatial utilities test suite
