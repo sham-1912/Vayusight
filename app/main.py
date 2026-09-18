@@ -3,11 +3,18 @@ Production FastAPI REST API Backend for Vayusight (Member A Lead - Week 13)
 Exposes endpoints for time-series forecasting, spatial grid estimation, SHAP explainability, and health risk.
 """
 
+import os
+import sys
+import numpy as np
+import pandas as pd
+from datetime import datetime, timezone
+
+# Ensure project root is in Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timezone
-import numpy as np
 import pandas as pd
 
 from src.data_ingestion import OpenAQClient, WeatherClient
