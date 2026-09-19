@@ -1,7 +1,7 @@
 """
 Production Plotly Dash Application for Vayusight (Member B Lead - Week 14)
-Multi-page interactive dashboard presenting Political Map Grid centered on Live Location,
-Time-Series Forecasts, SHAP Feature Explanations, and Hyperlocal Health Burden.
+Multi-page interactive dashboard presenting Political Regional Map Grid centered on Live Location,
+Time-Series Forecasts, SHAP Feature Explanations with Feature Dictionary, and Hyperlocal Health Burden.
 
 Designed with clean, grounded, utility-first aesthetics (no dark purple slop or glassmorphism).
 """
@@ -29,7 +29,7 @@ app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     suppress_callback_exceptions=True,
-    title="Vayusight | AQI Spatial Map & Forecasts"
+    title="Vayusight | Political AQI Map & Feature Explainability"
 )
 
 # Custom grounded CSS style dictionary
@@ -66,6 +66,66 @@ def get_grid_around_location(lat: float, lon: float, delta_deg: float = 0.25):
 
 initial_spatial, initial_health = get_grid_around_location(DEFAULT_LAT, DEFAULT_LON)
 
+# Feature Dictionary mapping each feature to what it is, what it does, and its environmental/health impact
+FEATURE_EXPLANABILITY_DICTIONARY = [
+    {
+        "name": "PM2.5 (Fine Dust)",
+        "tag": "Primary Air Pollutant",
+        "color": "#E11D48",
+        "what_it_is": "Microscopic airborne particles under 2.5 microns (dust, soot, smoke from vehicle exhausts and biomass burning).",
+        "what_it_does": "Penetrates deep into human lungs and bloodstreams. Primary driver of respiratory illness and 60%+ of AQI spikes.",
+        "impact": "High PM2.5 rapidly raises AQI score and increases cardiac & asthma emergency risk."
+    },
+    {
+        "name": "PM10 (Coarse Dust)",
+        "tag": "Air Pollutant",
+        "color": "#D97706",
+        "what_it_is": "Coarse airborne particles under 10 microns (construction debris, unpaved road dust, pollen).",
+        "what_it_does": "Irritates eyes, throat, and upper airways, causing coughing and shortness of breath.",
+        "impact": "Elevates short-term AQI baseline; heavily affected by road traffic and dry weather."
+    },
+    {
+        "name": "NO2 (Nitrogen Dioxide)",
+        "tag": "Gaseous Emission",
+        "color": "#EA580C",
+        "what_it_is": "Reddish-brown toxic gas produced by diesel vehicle combustion engines and power plants.",
+        "what_it_does": "Reacts with sunlight to form ground-level ozone and toxic nitrate aerosols.",
+        "impact": "Causes airway inflammation and serves as an indicator of heavy urban traffic density."
+    },
+    {
+        "name": "AOD (Aerosol Optical Depth at 550nm)",
+        "tag": "Satellite Remote Sensing",
+        "color": "#0EA5E9",
+        "what_it_is": "Satellite measure of total sunlight extinction by airborne particles across the entire atmospheric column.",
+        "what_it_does": "Provides continuous remote sensing coverage over un-monitored rural and sensor-free regions.",
+        "impact": "High AOD indicates thick atmospheric haze layer overhead even where ground sensors are missing."
+    },
+    {
+        "name": "Wind Vectors (U & V Components)",
+        "tag": "Meteorological Transport",
+        "color": "#10B981",
+        "what_it_is": "Orthogonal wind direction and speed vectors (U = East-West, V = North-South transport).",
+        "what_it_does": "Models pollutant dispersion and regional smoke transport across city boundaries.",
+        "impact": "High wind speeds clear and disperse local smog; stagnant calm winds trap pollutants locally."
+    },
+    {
+        "name": "AOD / PM2.5 Calibration Ratio",
+        "tag": "Multi-Source Fusion Feature",
+        "color": "#8B5CF6",
+        "what_it_is": "Fusion ratio comparing atmospheric column satellite AOD to surface ground monitor readings.",
+        "what_it_does": "Calibrates space-borne satellite imagery against physical surface ground concentrations.",
+        "impact": "Improves spatial estimation accuracy when interpolating AQI across sensor-sparse grid cells."
+    },
+    {
+        "name": "Road Density Index",
+        "tag": "OpenStreetMap Covariate",
+        "color": "#64748B",
+        "what_it_is": "Spatial density metric of vehicular highways, major arterial roads, and intersections.",
+        "what_it_does": "Acts as a spatial proxy for local baseline vehicular emission intensity.",
+        "impact": "Higher road density elevates predicted local PM2.5 and NO2 levels in neighbourhood grid cells."
+    }
+]
+
 # Application Layout
 app.layout = html.Div(
     style={"backgroundColor": "#F8FAFC", "minHeight": "100vh", "fontFamily": "Segoe UI, sans-serif"},
@@ -80,7 +140,7 @@ app.layout = html.Div(
                 dbc.Row([
                     dbc.Col([
                         html.H4("Vayusight", style={"fontWeight": "700", "margin": "0", "display": "inline-block", "color": "#0EA5E9"}),
-                        html.Span(" | Political AQI Map & Multi-Source Forecasting System", style={"fontSize": "15px", "color": "#94A3B8", "marginLeft": "12px"})
+                        html.Span(" | Regional Political AQI Map & Feature Explainability System", style={"fontSize": "15px", "color": "#94A3B8", "marginLeft": "12px"})
                     ], width=7),
                     dbc.Col([
                         html.Div(id="location-status-badge", children="📍 Location: Detecting Browser GPS...", style={"textAlign": "right", "fontSize": "13px", "color": "#CBD5E1", "marginTop": "4px"})
@@ -97,14 +157,14 @@ app.layout = html.Div(
             dbc.Row([
                 dbc.Col([
                     html.Div(style=CARD_STYLE, children=[
-                        html.Div("Mean Local AQI", style={"fontSize": "13px", "color": "#64748B", "fontWeight": "600"}),
+                        html.Div("Mean Regional AQI", style={"fontSize": "13px", "color": "#64748B", "fontWeight": "600"}),
                         html.H3(id="metric-aqi", children=f"{initial_spatial['estimated_aqi'].mean():.1f}", style={"color": "#0F172A", "fontWeight": "700", "marginTop": "8px"}),
                         html.Span(id="metric-cat", children="Category: Very Poor", style={"fontSize": "12px", "color": "#E11D48", "fontWeight": "600"})
                     ])
                 ], width=3),
                 dbc.Col([
                     html.Div(style=CARD_STYLE, children=[
-                        html.Div("Nearby Grid Cells", style={"fontSize": "13px", "color": "#64748B", "fontWeight": "600"}),
+                        html.Div("Regional Grid Shading", style={"fontSize": "13px", "color": "#64748B", "fontWeight": "600"}),
                         html.H3(id="metric-cells", children=f"{len(initial_spatial)} cells", style={"color": "#0F172A", "fontWeight": "700", "marginTop": "8px"}),
                         html.Span("Resolution: ~2.5 km grid", style={"fontSize": "12px", "color": "#0EA5E9"})
                     ])
@@ -130,9 +190,9 @@ app.layout = html.Div(
                 id="app-tabs",
                 active_tab="map-tab",
                 children=[
-                    dbc.Tab(label="Political AQI Map", tab_id="map-tab"),
+                    dbc.Tab(label="Political AQI Regional Map", tab_id="map-tab"),
                     dbc.Tab(label="Time-Series Forecast", tab_id="forecast-tab"),
-                    dbc.Tab(label="SHAP Explainability", tab_id="shap-tab"),
+                    dbc.Tab(label="Feature Explainability Guide", tab_id="shap-tab"),
                     dbc.Tab(label="Hyperlocal Health Risk", tab_id="health-tab"),
                 ]
             ),
@@ -145,35 +205,33 @@ app.layout = html.Div(
 )
 
 
-def create_political_map_figure(df, center_lat, center_lon, color_col, size_col, scale, title_text, hover_name=None, hover_data=None):
+def create_political_regional_map(df, center_lat, center_lon, color_col, scale, title_text, hover_name=None, hover_data=None):
     """
-    Creates a Political Map figure showing administrative boundaries, city names,
-    and road networks overlayed with AQI pollution intensity.
+    Creates a Political Map figure with regional density shading across administrative boundaries,
+    city labels, and road networks overlayed with AQI pollution intensity.
     """
-    if hasattr(px, "scatter_map"):
-        fig = px.scatter_map(
+    if hasattr(px, "density_map"):
+        fig = px.density_map(
             df,
             lat="latitude",
             lon="longitude",
-            color=color_col,
-            size=size_col,
+            z=color_col,
+            radius=25,
             color_continuous_scale=scale,
-            size_max=18,
             zoom=10,
             hover_name=hover_name,
             hover_data=hover_data,
             title=title_text
         )
         fig.update_layout(map_style="open-street-map", map_center={"lat": center_lat, "lon": center_lon})
-    elif hasattr(px, "scatter_mapbox"):
-        fig = px.scatter_mapbox(
+    elif hasattr(px, "density_mapbox"):
+        fig = px.density_mapbox(
             df,
             lat="latitude",
             lon="longitude",
-            color=color_col,
-            size=size_col,
+            z=color_col,
+            radius=25,
             color_continuous_scale=scale,
-            size_max=18,
             zoom=10,
             mapbox_style="open-street-map",
             hover_name=hover_name,
@@ -187,29 +245,32 @@ def create_political_map_figure(df, center_lat, center_lon, color_col, size_col,
             x="longitude",
             y="latitude",
             color=color_col,
-            size=size_col,
+            size=color_col,
             color_continuous_scale=scale,
             title=title_text
         )
 
     # Add marker pin for User's Current Location
-    fig.add_trace(go.Scattermap(
-        lat=[center_lat],
-        lon=[center_lon],
-        mode="markers+text",
-        marker=dict(size=14, color="#0EA5E9"),
-        text=["📍 Current Location"],
-        textposition="top center",
-        name="You are here"
-    ) if hasattr(go, "Scattermap") else go.Scattermapbox(
-        lat=[center_lat],
-        lon=[center_lon],
-        mode="markers+text",
-        marker=dict(size=14, color="#0EA5E9"),
-        text=["📍 Current Location"],
-        textposition="top center",
-        name="You are here"
-    ))
+    if hasattr(go, "Scattermap"):
+        fig.add_trace(go.Scattermap(
+            lat=[center_lat],
+            lon=[center_lon],
+            mode="markers+text",
+            marker=dict(size=14, color="#0EA5E9"),
+            text=["📍 Current Location"],
+            textposition="top center",
+            name="You are here"
+        ))
+    elif hasattr(go, "Scattermapbox"):
+        fig.add_trace(go.Scattermapbox(
+            lat=[center_lat],
+            lon=[center_lon],
+            mode="markers+text",
+            marker=dict(size=14, color="#0EA5E9"),
+            text=["📍 Current Location"],
+            textposition="top center",
+            name="You are here"
+        ))
 
     fig.update_layout(margin={"r":0,"t":40,"l":0,"b":0}, height=580)
     return fig
@@ -250,20 +311,19 @@ def render_tab_content(active_tab, pos):
     health_text = f"{mean_health:.1f}"
 
     if active_tab == "map-tab":
-        fig_map = create_political_map_figure(
+        fig_map = create_political_regional_map(
             spatial_df,
             center_lat=current_lat,
             center_lon=current_lon,
             color_col="estimated_aqi",
-            size_col="estimated_aqi",
             scale="Reds",
-            title_text=f"Political AQI Map Centered Around Current Location ({current_lat:.3f}, {current_lon:.3f})",
+            title_text=f"Regional Political Map Shading Centered Around Live Location ({current_lat:.3f}, {current_lon:.3f})",
             hover_name="cell_id",
             hover_data=["estimated_aqi", "aqi_category", "aod_550"]
         )
 
         content = html.Div(style=CARD_STYLE, children=[
-            html.H5("Political Regional AQI Map & Local Sensors (~2.5 km Grid)", style={"fontWeight": "600"}),
+            html.H5("Political Regional Map AQI Shading (~2.5 km Grid Resolution)", style={"fontWeight": "600"}),
             dcc.Graph(figure=fig_map)
         ])
 
@@ -306,33 +366,46 @@ def render_tab_content(active_tab, pos):
             color_continuous_scale="RdBu_r",
             title="Global SHAP Feature Attribution Ranking"
         )
-        fig_shap.update_layout(template="plotly_white", height=450)
+        fig_shap.update_layout(template="plotly_white", height=400)
+
+        # Feature dictionary cards explainability list
+        feature_cards = []
+        for feat in FEATURE_EXPLANABILITY_DICTIONARY:
+            feature_cards.append(
+                dbc.Col([
+                    html.Div(style={"backgroundColor": "#F8FAFC", "border": f"1px solid {feat['color']}", "borderLeft": f"5px solid {feat['color']}", "borderRadius": "6px", "padding": "16px", "marginBottom": "16px"}, children=[
+                        html.Div([
+                            html.Span(feat["name"], style={"fontWeight": "700", "fontSize": "15px", "color": "#0F172A"}),
+                            html.Span(feat["tag"], style={"float": "right", "fontSize": "11px", "backgroundColor": feat["color"], "color": "#FFFFFF", "padding": "2px 8px", "borderRadius": "12px", "fontWeight": "600"})
+                        ]),
+                        html.Hr(style={"margin": "8px 0"}),
+                        html.Div([html.Strong("What it is: "), html.Span(feat["what_it_is"])], style={"fontSize": "13px", "color": "#334155", "marginBottom": "4px"}),
+                        html.Div([html.Strong("What it does: "), html.Span(feat["what_it_does"])], style={"fontSize": "13px", "color": "#334155", "marginBottom": "4px"}),
+                        html.Div([html.Strong("AQI Impact: "), html.Span(feat["impact"])], style={"fontSize": "12px", "color": "#64748B", "fontStyle": "italic"})
+                    ])
+                ], width=6)
+            )
 
         content = html.Div(style=CARD_STYLE, children=[
-            html.H5("SHAP Explainability & Feature Drivers", style={"fontWeight": "600"}),
+            html.H5("SHAP Explainability & Global Feature Importance", style={"fontWeight": "600"}),
             dcc.Graph(figure=fig_shap),
-            html.Div(
-                style={"backgroundColor": "#F1F5F9", "padding": "16px", "borderRadius": "4px", "marginTop": "16px"},
-                children=[
-                    html.Strong("Natural Language Explanation: "),
-                    html.Span("AQI is driven higher primarily by PM2.5 fine dust concentration (+62.4 AQI points) and Satellite AOD (+18.5 AQI points), partially offset by moderate wind speed (-28.1 AQI points).")
-                ]
-            )
+            html.Br(),
+            html.H5("Feature Explainability Guide (What Each Feature Does & Its Environmental Impact)", style={"fontWeight": "600", "marginBottom": "16px"}),
+            dbc.Row(feature_cards)
         ])
 
     elif active_tab == "health-tab":
-        fig_health = create_political_map_figure(
+        fig_health = create_political_regional_map(
             health_df,
             center_lat=current_lat,
             center_lon=current_lon,
             color_col="estimated_excess_respiratory_events_per_100k",
-            size_col="estimated_excess_respiratory_events_per_100k",
             scale="Purples",
             title_text="Estimated Respiratory Health Incidence Risk per 100,000 Population (WHO Baseline)"
         )
 
         content = html.Div(style=CARD_STYLE, children=[
-            html.H5("Hyperlocal Health-Risk Translation Map", style={"fontWeight": "600"}),
+            html.H5("Hyperlocal Health-Risk Regional Map", style={"fontWeight": "600"}),
             dcc.Graph(figure=fig_health)
         ])
 
