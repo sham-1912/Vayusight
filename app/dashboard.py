@@ -126,6 +126,7 @@ initial_spatial, initial_health = get_grid_around_location(DEFAULT_LAT, DEFAULT_
 # Comprehensive Feature Explainability Dictionary (13 Core Atmospheric Science & Multi-Source Fusion Features)
 FEATURE_EXPLANABILITY_DICTIONARY = [
     {
+        "category": "Ground Pollutants",
         "name": "PM2.5 (Fine Particulate Matter)",
         "tag": "Primary Respiratory Toxin",
         "color": "#E11D48",
@@ -135,6 +136,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Delhi/UP: 160–280 µg/m³ (Severe) | Tamil Nadu/Kerala: 15–30 µg/m³ (Good/Satisfactory) | WHO Safe limit: 15 µg/m³"
     },
     {
+        "category": "Ground Pollutants",
         "name": "PM10 (Coarse Inhalable Dust)",
         "tag": "Coarse Particulate Matter",
         "color": "#D97706",
@@ -144,6 +146,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Delhi/Rajasthan: 220–380 µg/m³ | Tamil Nadu/Karnataka: 35–65 µg/m³ | WHO Safe limit: 45 µg/m³"
     },
     {
+        "category": "Ground Pollutants",
         "name": "NO2 (Nitrogen Dioxide)",
         "tag": "Gaseous Emission",
         "color": "#EA580C",
@@ -153,6 +156,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Delhi/Mumbai: 60–85 ppb (High Traffic) | Tamil Nadu/Assam: 18–28 ppb (Moderate/Clean)"
     },
     {
+        "category": "Ground Pollutants",
         "name": "SO2 (Sulfur Dioxide)",
         "tag": "Industrial Gas Emission",
         "color": "#B45309",
@@ -162,6 +166,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Gujarat Refineries / UP Power Belt: 25–35 ppb | Tamil Nadu / Kerala: 4–10 ppb"
     },
     {
+        "category": "Ground Pollutants",
         "name": "CO (Carbon Monoxide)",
         "tag": "Incomplete Combustion Exhaust",
         "color": "#7C2D12",
@@ -171,6 +176,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Punjab Stubble Plumes / Delhi: 1.8–3.2 mg/m³ | Southern Coastal States: 0.3–0.7 mg/m³"
     },
     {
+        "category": "Ground Pollutants",
         "name": "O3 (Ground-Level Photochemical Ozone)",
         "tag": "Secondary Photochemical Smog",
         "color": "#C026D3",
@@ -180,6 +186,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Sunny Indo-Gangetic Plain: 40–55 ppb | Cloud-covered Coastal Belt: 15–22 ppb"
     },
     {
+        "category": "Satellite Remote Sensing",
         "name": "AOD 550nm (Satellite Aerosol Optical Depth)",
         "tag": "Sentinel-5P / MODIS Satellite",
         "color": "#0EA5E9",
@@ -189,6 +196,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Delhi / UP Haze Layer: 0.75–0.92 | Tamil Nadu / Kerala Marine Air: 0.12–0.22"
     },
     {
+        "category": "Meteorology & Transport",
         "name": "PBLH (Planetary Boundary Layer Height)",
         "tag": "Meteorological Inversion Depth",
         "color": "#0284C7",
@@ -198,6 +206,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Delhi Winter Inversion: 180–300m (Toxic Trap) | Coastal Tamil Nadu: 800–1200m (High Mixing)"
     },
     {
+        "category": "Meteorology & Transport",
         "name": "Wind Dispersion Vectors (U & V Velocity)",
         "tag": "Advection & Smoke Transport",
         "color": "#10B981",
@@ -207,6 +216,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Stagnant Gangetic Plain: 0.8–1.8 m/s | Coastal Marine Breeze (TN/Kerala): 4.5–7.2 m/s"
     },
     {
+        "category": "Meteorology & Transport",
         "name": "Relative Humidity & Dew Point",
         "tag": "Atmospheric Moisture",
         "color": "#2563EB",
@@ -216,6 +226,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "North India Winter Fog: 85–95% RH | Central Dry Plateau: 35–50% RH"
     },
     {
+        "category": "Multi-Source Fusion",
         "name": "AOD / PM2.5 Calibration Ratio",
         "tag": "Multi-Source Fusion Feature",
         "color": "#8B5CF6",
@@ -225,6 +236,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Calibrated Ratio: 280.0 – 410.0 AQI / AOD unit"
     },
     {
+        "category": "Land Use & OSM",
         "name": "Road Network Density Index",
         "tag": "OpenStreetMap Covariate",
         "color": "#64748B",
@@ -234,6 +246,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
         "irl_range": "Urban Metropolitan Grid: High Density (+18% PM2.5) | Forest / Rural Grid: Low Density (-25% PM2.5)"
     },
     {
+        "category": "Land Use & Canopy",
         "name": "NDVI (Vegetation Canopy Index)",
         "tag": "Green Barrier & Dust Sink",
         "color": "#059669",
@@ -778,7 +791,7 @@ def render_tab_content(active_tab, pos):
                             html.Span(feat["tag"], style={"float": "right", "fontSize": "11px", "backgroundColor": feat["color"], "color": "#FFFFFF", "padding": "3px 10px", "borderRadius": "12px", "fontWeight": "600"})
                         ]),
                         html.Hr(style={"margin": "10px 0"}),
-                        html.Div([html.Strong("Category: ", style={"color": "#0EA5E9"}), html.Span(feat["category"])], style={"fontSize": "12px", "marginBottom": "4px"}),
+                        html.Div([html.Strong("Category: ", style={"color": "#0EA5E9"}), html.Span(feat.get("category", "Atmospheric Science"))], style={"fontSize": "12px", "marginBottom": "4px"}),
                         html.Div([html.Strong("What it is: ", style={"color": "#0F172A"}), html.Span(feat["what_it_is"])], style={"fontSize": "13px", "color": "#334155", "marginBottom": "6px"}),
                         html.Div([html.Strong("What it does: ", style={"color": "#0F172A"}), html.Span(feat["what_it_does"])], style={"fontSize": "13px", "color": "#334155", "marginBottom": "6px"}),
                         html.Div([html.Strong("AQI & Health Impact: ", style={"color": "#0F172A"}), html.Span(feat["impact"])], style={"fontSize": "13px", "color": "#334155", "marginBottom": "6px"}),
