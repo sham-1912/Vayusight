@@ -341,20 +341,23 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
     """
     Creates an All-India Political Map figure displaying state boundaries, capital cities,
     and CPCB continuous multi-color shading (vibrant teal/green for Satisfactory/Good states like TN/Kerala).
+    Fixed color scales (range_color) ensure visually distinct heatmap distributions across different pollutant layers.
     """
     df_plot = df_states.copy()
     
-    # Select target column and title
+    # Select target column, title, color range, and unit string
     layer_configs = {
-        "estimated_aqi": ("estimated_aqi", "AQI Index Value"),
-        "pm25": ("pm25", "PM2.5 Concentration (µg/m³)"),
-        "pm10": ("pm10", "PM10 Coarse Dust (µg/m³)"),
-        "no2": ("no2", "NO2 Gas (ppb)"),
-        "so2": ("so2", "SO2 Industrial Gas (ppb)"),
-        "o3": ("o3", "Ground Ozone O3 (ppb)"),
-        "aod_550": ("aod_550", "Satellite AOD Optical Depth")
+        "estimated_aqi": ("estimated_aqi", "AQI Index Value", [0, 400], "AQI"),
+        "pm25": ("pm25", "PM2.5 Concentration (µg/m³)", [0, 200], "µg/m³"),
+        "pm10": ("pm10", "PM10 Coarse Dust (µg/m³)", [0, 300], "µg/m³"),
+        "no2": ("no2", "NO2 Gas (ppb)", [0, 80], "ppb"),
+        "so2": ("so2", "SO2 Industrial Gas (ppb)", [0, 40], "ppb"),
+        "o3": ("o3", "Ground Ozone O3 (ppb)", [0, 60], "ppb"),
+        "aod_550": ("aod_550", "Satellite AOD Optical Depth", [0.0, 1.0], "AOD")
     }
-    col, layer_title = layer_configs.get(selected_layer, ("estimated_aqi", "AQI Index Value"))
+    col, layer_title, rng_color, unit = layer_configs.get(
+        selected_layer, ("estimated_aqi", "AQI Index Value", [0, 400], "AQI")
+    )
 
     if hasattr(px, "density_map"):
         fig = px.density_map(
@@ -364,6 +367,7 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             z=col,
             radius=48,
             color_continuous_scale=CPCB_COLOR_SCALE,
+            range_color=rng_color,
             zoom=4.5,
             hover_name="state",
             hover_data=["capital", "estimated_aqi", "aqi_category", "driver", "pm25", "pm10", "no2", "so2", "o3", "aod_550"],
@@ -378,6 +382,7 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             z=col,
             radius=48,
             color_continuous_scale=CPCB_COLOR_SCALE,
+            range_color=rng_color,
             zoom=4.5,
             mapbox_style="open-street-map",
             hover_name="state",
@@ -393,8 +398,12 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             color=col,
             size=col,
             color_continuous_scale=CPCB_COLOR_SCALE,
+            range_color=rng_color,
             title=f"All-India Political State AQI Map — {layer_title}"
         )
+
+    # Marker pin text formatted with specific unit
+    marker_text = df_plot["state"] + " (" + df_plot[col].astype(str) + " " + unit + ")"
 
     # Add State Capital Marker Pins
     if hasattr(go, "Scattermap"):
@@ -403,7 +412,7 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             lon=df_plot["longitude"],
             mode="markers+text",
             marker=dict(size=10, color="#0F172A"),
-            text=df_plot["state"] + " (" + df_plot[col].astype(str) + ")",
+            text=marker_text,
             textposition="top center",
             name="State Capitals & Values"
         ))
@@ -424,7 +433,7 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             lon=df_plot["longitude"],
             mode="markers+text",
             marker=dict(size=10, color="#0F172A"),
-            text=df_plot["state"] + " (" + df_plot[col].astype(str) + ")",
+            text=marker_text,
             textposition="top center",
             name="State Capitals & Values"
         ))
