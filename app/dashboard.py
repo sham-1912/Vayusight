@@ -402,50 +402,56 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             title=f"All-India Political State AQI Map — {layer_title}"
         )
 
-    # Marker pin text formatted with specific unit
-    marker_text = df_plot["state"] + " (" + df_plot[col].astype(str) + " " + unit + ")"
+    # Rich hover text for individual state capital pins
+    hover_text = df_plot["state"] + " (" + df_plot["capital"] + "): " + df_plot[col].astype(str) + " " + unit
 
-    # Add State Capital Marker Pins
+    # Add State Capital Marker Pins (mode='markers' avoids unreadable text label overlap in dense regions)
     if hasattr(go, "Scattermap"):
         fig.add_trace(go.Scattermap(
             lat=df_plot["latitude"],
             lon=df_plot["longitude"],
-            mode="markers+text",
-            marker=dict(size=10, color="#0F172A"),
-            text=marker_text,
-            textposition="top center",
-            name="State Capitals & Values"
+            mode="markers",
+            marker=dict(size=8, color="#0F172A", opacity=0.85),
+            hoverinfo="text",
+            hovertext=hover_text,
+            name="State Capitals"
         ))
         if selected_state_name and selected_state_name in df_plot["state"].values:
             sel_row = df_plot[df_plot["state"] == selected_state_name].iloc[0]
+            val_str = f"{sel_row[col]} {unit}"
             fig.add_trace(go.Scattermap(
                 lat=[sel_row["latitude"]],
                 lon=[sel_row["longitude"]],
                 mode="markers+text",
-                marker=dict(size=18, color="#0EA5E9"),
-                text=[f"📍 Selected: {selected_state_name}"],
-                textposition="bottom center",
+                marker=dict(size=16, color="#0EA5E9"),
+                text=[f"📍 {selected_state_name}: {val_str}"],
+                textposition="top center",
+                hoverinfo="text",
+                hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"],
                 name="Selected State"
             ))
     elif hasattr(go, "Scattermapbox"):
         fig.add_trace(go.Scattermapbox(
             lat=df_plot["latitude"],
             lon=df_plot["longitude"],
-            mode="markers+text",
-            marker=dict(size=10, color="#0F172A"),
-            text=marker_text,
-            textposition="top center",
-            name="State Capitals & Values"
+            mode="markers",
+            marker=dict(size=8, color="#0F172A", opacity=0.85),
+            hoverinfo="text",
+            hovertext=hover_text,
+            name="State Capitals"
         ))
         if selected_state_name and selected_state_name in df_plot["state"].values:
             sel_row = df_plot[df_plot["state"] == selected_state_name].iloc[0]
+            val_str = f"{sel_row[col]} {unit}"
             fig.add_trace(go.Scattermapbox(
                 lat=[sel_row["latitude"]],
                 lon=[sel_row["longitude"]],
                 mode="markers+text",
-                marker=dict(size=18, color="#0EA5E9"),
-                text=[f"📍 Selected: {selected_state_name}"],
-                textposition="bottom center",
+                marker=dict(size=16, color="#0EA5E9"),
+                text=[f"📍 {selected_state_name}: {val_str}"],
+                textposition="top center",
+                hoverinfo="text",
+                hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"],
                 name="Selected State"
             ))
 
