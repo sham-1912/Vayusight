@@ -7,8 +7,8 @@ Structured according to CRISP-DM (Cross-Industry Standard Process for Data Minin
 4. Model Explainability (SHAP Feature Importance & Remote Sensing Calibration)
 5. Deployment & Hyperlocal Risk Assessment (~2.5km Grid & WHO Health Burden)
 
-Designed with clean, restrained, high data-to-ink ratio aesthetics (slate navy tones, zero visual slop/gradients/neon glow).
-All chart legends, modebars, and colorbars formatted with clean non-overlapping margins.
+Designed with clean, restrained, high data-to-ink ratio aesthetics in a light executive slate theme (#ECEFF1 bg).
+All emojis removed from UI. Legends positioned at bottom to guarantee zero text collisions with chart titles.
 """
 
 import os
@@ -37,12 +37,12 @@ app = dash.Dash(
     title="Vayusight | CRISP-DM AQI Analytics & Forecasting Dashboard"
 )
 
-# Custom grounded CSS style dictionary
+# Custom executive slate light-theme CSS style dictionary
 CARD_STYLE = {
     "backgroundColor": "#FFFFFF",
-    "border": "1px solid #E2E8F0",
+    "border": "1px solid #CFD8DC",
     "borderRadius": "4px",
-    "boxShadow": "0 1px 2px rgba(0,0,0,0.03)",
+    "boxShadow": "0 1px 3px rgba(15,23,42,0.06)",
     "padding": "16px",
     "marginBottom": "16px"
 }
@@ -55,20 +55,22 @@ HEADER_STYLE = {
 }
 
 FILTER_BAR_STYLE = {
-    "backgroundColor": "#F1F5F9",
-    "border": "1px solid #CBD5E1",
+    "backgroundColor": "#FFFFFF",
+    "border": "1px solid #CFD8DC",
     "borderRadius": "4px",
     "padding": "12px 16px",
-    "marginBottom": "16px"
+    "marginBottom": "16px",
+    "boxShadow": "0 1px 2px rgba(15,23,42,0.04)"
 }
 
 INSIGHTS_BOX_STYLE = {
-    "backgroundColor": "#F8FAFC",
-    "borderLeft": "4px solid #0EA5E9",
-    "border": "1px solid #E2E8F0",
+    "backgroundColor": "#FFFFFF",
+    "borderLeft": "4px solid #0284C7",
+    "border": "1px solid #CFD8DC",
     "borderRadius": "4px",
     "padding": "12px 16px",
-    "marginBottom": "16px"
+    "marginBottom": "16px",
+    "boxShadow": "0 1px 2px rgba(15,23,42,0.04)"
 }
 
 # CPCB Official Multi-Color Continuous Scale
@@ -271,7 +273,7 @@ FEATURE_EXPLANABILITY_DICTIONARY = [
 
 # Application Layout
 app.layout = html.Div(
-    style={"backgroundColor": "#F8FAFC", "minHeight": "100vh", "fontFamily": "Segoe UI, -apple-system, sans-serif"},
+    style={"backgroundColor": "#ECEFF1", "minHeight": "100vh", "fontFamily": "Segoe UI, -apple-system, sans-serif"},
     children=[
         dcc.Geolocation(id="geolocation", high_accuracy=True),
 
@@ -283,10 +285,10 @@ app.layout = html.Div(
                     dbc.Col([
                         html.H4("Vayusight", style={"fontWeight": "700", "margin": "0", "display": "inline-block", "color": "#38BDF8"}),
                         html.Span(" | All-India Multi-Source AQI Fusion & Environmental Risk Analytics", style={"fontSize": "14px", "color": "#CBD5E1", "marginLeft": "12px"}),
-                        html.Div("CRISP-DM Workflow: Data Understanding ➔ Spatial Fusion ➔ Predictive Modeling ➔ Explainability ➔ Risk Deployment", style={"fontSize": "11px", "color": "#94A3B8", "marginTop": "2px"})
+                        html.Div("CRISP-DM Workflow: Data Understanding -> Spatial Fusion -> Predictive Modeling -> Explainability -> Risk Deployment", style={"fontSize": "11px", "color": "#94A3B8", "marginTop": "2px"})
                     ], width=8),
                     dbc.Col([
-                        html.Div(id="location-status-badge", children="📍 GPS Status: Detecting Location...", style={"textAlign": "right", "fontSize": "12px", "color": "#E2E8F0", "marginTop": "4px"}),
+                        html.Div(id="location-status-badge", children="GPS Status: Detecting Location...", style={"textAlign": "right", "fontSize": "12px", "color": "#E2E8F0", "marginTop": "4px"}),
                         html.Div("Coverage: CPCB Network + Sentinel-5P / MODIS AOD + ERA5 Reanalysis", style={"textAlign": "right", "fontSize": "10px", "color": "#94A3B8"})
                     ], width=4)
                 ])
@@ -304,7 +306,7 @@ app.layout = html.Div(
                         html.Label("Target Region / State:", style={"fontSize": "11px", "fontWeight": "700", "color": "#334155", "textTransform": "uppercase", "letterSpacing": "0.5px"}),
                         dcc.Dropdown(
                             id="state-inspector-dropdown",
-                            options=[{"label": "🇮🇳 All-India Overview (33 Regions)", "value": "ALL"}] + [{"label": f"{r['state']} ({r['estimated_aqi']} AQI)", "value": r['state']} for _, r in INDIA_STATES_IRL_AQI.iterrows()],
+                            options=[{"label": "All-India Overview (33 Regions)", "value": "ALL"}] + [{"label": f"{r['state']} ({r['estimated_aqi']} AQI)", "value": r['state']} for _, r in INDIA_STATES_IRL_AQI.iterrows()],
                             value="ALL",
                             clearable=False,
                             style={"fontSize": "13px"}
@@ -400,17 +402,17 @@ app.layout = html.Div(
                 ], width=3)
             ]),
 
-            # CRISP-DM Analytical Workflow Tabs
+            # CRISP-DM Analytical Workflow Tabs (Clean typography, zero emojis)
             dbc.Tabs(
                 id="app-tabs",
                 active_tab="map-tab",
                 style={"flexWrap": "nowrap", "overflowX": "auto"},
                 children=[
-                    dbc.Tab(label="🌐 Phase 1 & 2: Spatial Map & Rankings", tab_id="map-tab"),
-                    dbc.Tab(label="📈 Phase 3: 72h Forecasts & Models", tab_id="forecast-tab"),
-                    dbc.Tab(label="🔬 Phase 4: Distributions & Correlations", tab_id="correlations-tab"),
-                    dbc.Tab(label="🧠 Phase 5: SHAP & Remote Sensing", tab_id="explain-tab"),
-                    dbc.Tab(label="🏥 Phase 6: Hyperlocal Grid & Health", tab_id="grid-tab"),
+                    dbc.Tab(label="Phase 1 & 2: Spatial Map & Rankings", tab_id="map-tab"),
+                    dbc.Tab(label="Phase 3: 72h Forecasts & Models", tab_id="forecast-tab"),
+                    dbc.Tab(label="Phase 4: Distributions & Correlations", tab_id="correlations-tab"),
+                    dbc.Tab(label="Phase 5: SHAP & Remote Sensing", tab_id="explain-tab"),
+                    dbc.Tab(label="Phase 6: Hyperlocal Grid & Health", tab_id="grid-tab"),
                 ]
             ),
             html.Br(),
@@ -472,8 +474,8 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             val_str = f"{sel_row[col]} {unit}"
             fig.add_trace(go.Scattermap(
                 lat=[sel_row["latitude"]], lon=[sel_row["longitude"]], mode="markers+text",
-                marker=dict(size=16, color="#0EA5E9"), text=[f"📍 {selected_state_name}: {val_str}"],
-                textposition="top center", hoverinfo="text", hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"], showlegend=False
+                marker=dict(size=16, color="#0EA5E9"), text=[f"Selected: {selected_state_name} ({val_str})"],
+                textposition="top center", hoverinfo="text", hovertext=[f"Selected State: {selected_state_name} ({val_str})"], showlegend=False
             ))
     elif hasattr(go, "Scattermapbox"):
         fig.add_trace(go.Scattermapbox(
@@ -485,13 +487,14 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             val_str = f"{sel_row[col]} {unit}"
             fig.add_trace(go.Scattermapbox(
                 lat=[sel_row["latitude"]], lon=[sel_row["longitude"]], mode="markers+text",
-                marker=dict(size=16, color="#0EA5E9"), text=[f"📍 {selected_state_name}: {val_str}"],
-                textposition="top center", hoverinfo="text", hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"], showlegend=False
+                marker=dict(size=16, color="#0EA5E9"), text=[f"Selected: {selected_state_name} ({val_str})"],
+                textposition="top center", hoverinfo="text", hovertext=[f"Selected State: {selected_state_name} ({val_str})"], showlegend=False
             ))
 
     fig.update_layout(
+        title=dict(text=f"All-India Spatial AQI Density — {layer_title}", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
         margin={"r":10,"t":40,"l":0,"b":0}, height=580, template="plotly_white",
-        coloraxis_colorbar=dict(title=dict(text=unit, side="top"), len=0.85)
+        coloraxis_colorbar=dict(title=dict(text=unit, side="top"), len=0.8, x=1.01)
     )
     return fig
 
@@ -499,25 +502,31 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
 def create_state_ranking_bar_chart(df_states, selected_layer="estimated_aqi"):
     df_sorted = df_states.sort_values(by=selected_layer, ascending=True)
     layer_units = {
-        "estimated_aqi": ("estimated_aqi", "AQI Value", 50, "WHO Good Limit (50 AQI)"),
-        "pm25": ("pm25", "PM2.5 (µg/m³)", 15, "WHO Annual Guideline (15 µg/m³)"),
-        "pm10": ("pm10", "PM10 (µg/m³)", 45, "WHO Annual Guideline (45 µg/m³)"),
-        "no2": ("no2", "NO2 (ppb)", 25, "WHO Guideline (25 ppb)"),
-        "so2": ("so2", "SO2 (ppb)", 15, "WHO Guideline (15 ppb)"),
-        "o3": ("o3", "O3 (ppb)", 30, "WHO Guideline (30 ppb)"),
-        "aod_550": ("aod_550", "Satellite AOD", 0.20, "Clean Atmosphere Limit (0.20 AOD)")
+        "estimated_aqi": ("estimated_aqi", "AQI Value", 50, "WHO Limit (50 AQI)"),
+        "pm25": ("pm25", "PM2.5 (µg/m³)", 15, "WHO Limit (15 µg/m³)"),
+        "pm10": ("pm10", "PM10 (µg/m³)", 45, "WHO Limit (45 µg/m³)"),
+        "no2": ("no2", "NO2 (ppb)", 25, "WHO Limit (25 ppb)"),
+        "so2": ("so2", "SO2 (ppb)", 15, "WHO Limit (15 ppb)"),
+        "o3": ("o3", "O3 (ppb)", 30, "WHO Limit (30 ppb)"),
+        "aod_550": ("aod_550", "Satellite AOD", 0.20, "Clean Atmosphere (0.20 AOD)")
     }
     col, unit_title, ref_val, ref_label = layer_units.get(selected_layer, ("estimated_aqi", "AQI Value", 50, "WHO Limit"))
 
     fig = px.bar(
         df_sorted, x=col, y="state", orientation="h",
         color="estimated_aqi", color_continuous_scale=CPCB_COLOR_SCALE,
-        title=f"State Ranking & Severity Breakdown ({unit_title})",
         labels={col: unit_title, "state": "State / UT"},
         hover_data=["capital", "aqi_category", "driver"]
     )
-    fig.add_vline(x=ref_val, line_dash="dash", line_color="#E11D48", annotation_text=ref_label, annotation_position="top right")
-    fig.update_layout(margin={"r":40,"t":40,"l":10,"b":10}, height=580, template="plotly_white", coloraxis_showscale=False)
+    fig.add_vline(
+        x=ref_val, line_dash="dash", line_color="#E11D48",
+        annotation_text=ref_label, annotation_position="bottom right",
+        annotation_font_size=10, annotation_font_color="#E11D48"
+    )
+    fig.update_layout(
+        title=dict(text=f"State Severity Ranking ({unit_title})", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
+        margin={"r":35,"t":45,"l":10,"b":20}, height=580, template="plotly_white", coloraxis_showscale=False
+    )
     return fig
 
 
@@ -539,10 +548,10 @@ def create_forecast_figure(horizon_hours=72, mean_aqi=128.4):
     fig.add_trace(go.Scatter(x=dates, y=xgb_pred, mode="lines", name="XGBoost Regressor Baseline", line=dict(color="#10B981", width=2, dash="dot")))
 
     fig.update_layout(
-        title=f"{horizon_hours}-Hour Ahead Multi-Model Forecast vs Ground Truth (with 95% Confidence Interval)",
+        title=dict(text=f"{horizon_hours}-Hour Ahead Multi-Model Forecast vs Ground Truth", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
         xaxis_title="Timeline (UTC)", yaxis_title="AQI Concentration Index",
-        template="plotly_white", height=420, margin={"t":45,"b":20,"r":20,"l":20},
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        template="plotly_white", height=450, margin={"t":45,"b":70,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="top", y=-0.22, xanchor="center", x=0.5)
     )
     return fig
 
@@ -551,13 +560,13 @@ def create_pollutant_box_plot(df_states):
     df_melted = df_states.melt(id_vars=["state", "aqi_category"], value_vars=["pm25", "pm10", "no2", "so2", "o3"], var_name="pollutant", value_name="concentration")
     fig = px.box(
         df_melted, x="pollutant", y="concentration", color="aqi_category",
-        title="Multi-Pollutant Concentration Distribution Across CPCB Risk Categories",
         labels={"concentration": "Concentration Value", "pollutant": "Pollutant Metric", "aqi_category": "Category"},
         category_orders={"aqi_category": ["Good", "Satisfactory", "Moderate", "Poor", "Very Poor"]}
     )
     fig.update_layout(
-        template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20},
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=dict(text="Risk Category:"))
+        title=dict(text="Multi-Pollutant Concentration Distributions", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
+        template="plotly_white", height=450, margin={"t":45,"b":70,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="top", y=-0.22, xanchor="center", x=0.5, title=dict(text="Risk Category:"))
     )
     return fig
 
@@ -576,10 +585,12 @@ def create_correlation_heatmap():
        index=["PM2.5", "PM10", "NO2", "SO2", "O3", "PBLH", "Wind Speed", "Satellite AOD"])
 
     fig = px.imshow(
-        corr_matrix, text_auto=".2f", color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
-        title="Atmospheric & Satellite Covariate Pearson Correlation Heatmap"
+        corr_matrix, text_auto=".2f", color_continuous_scale="RdBu_r", zmin=-1, zmax=1
     )
-    fig.update_layout(template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20})
+    fig.update_layout(
+        title=dict(text="Atmospheric Pearson Correlation Heatmap", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
+        template="plotly_white", height=450, margin={"t":45,"b":20,"r":20,"l":20}
+    )
     return fig
 
 
@@ -593,12 +604,12 @@ def create_shap_importance_chart():
     fig = px.bar(
         shap_df, x="shap_importance", y="feature", orientation="h", color="direction",
         color_discrete_map={"Positive (+)": "#E11D48", "Negative (-)": "#10B981"},
-        title="SHAP Feature Importance & Contribution Ranking (%)",
         labels={"shap_importance": "Mean Absolute SHAP Impact (%)", "feature": "Feature Variable", "direction": "Effect Direction"}
     )
     fig.update_layout(
-        template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20},
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=dict(text="Effect Direction:"))
+        title=dict(text="SHAP Feature Importance Ranking (%)", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
+        template="plotly_white", height=450, margin={"t":45,"b":70,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="top", y=-0.22, xanchor="center", x=0.5, title=dict(text="Effect Direction:"))
     )
     return fig
 
@@ -608,13 +619,13 @@ def create_aod_calibration_scatter(df_states):
         df_states, x="aod_550", y="pm25", color="aqi_category", size="estimated_aqi",
         hover_name="state", hover_data=["capital", "estimated_aqi", "aqi_category"],
         color_continuous_scale=CPCB_COLOR_SCALE,
-        title="Satellite AOD (550nm) vs Ground PM2.5 Calibration",
         labels={"aod_550": "Satellite AOD (550nm)", "pm25": "Ground PM2.5 (µg/m³)", "aqi_category": "Category"}
     )
     fig.add_shape(type="line", x0=0.1, y0=20, x1=0.9, y1=200, line=dict(color="#64748B", width=1.5, dash="dash"))
     fig.update_layout(
-        template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20},
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=dict(text="Risk Category:"))
+        title=dict(text="Satellite AOD vs Ground PM2.5 Calibration", y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
+        template="plotly_white", height=450, margin={"t":45,"b":70,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="top", y=-0.22, xanchor="center", x=0.5, title=dict(text="Risk Category:"))
     )
     return fig
 
@@ -624,34 +635,37 @@ def create_political_regional_map(df, center_lat, center_lon, color_col, title_t
         fig = px.density_map(
             df, lat="latitude", lon="longitude", z=color_col, radius=32,
             color_continuous_scale=CPCB_COLOR_SCALE, zoom=10,
-            hover_name=hover_name, hover_data=hover_data, title=title_text
+            hover_name=hover_name, hover_data=hover_data
         )
         fig.update_layout(map_style="open-street-map", map_center={"lat": center_lat, "lon": center_lon})
     elif hasattr(px, "density_mapbox"):
         fig = px.density_mapbox(
             df, lat="latitude", lon="longitude", z=color_col, radius=32,
             color_continuous_scale=CPCB_COLOR_SCALE, zoom=10,
-            mapbox_style="open-street-map", hover_name=hover_name, hover_data=hover_data, title=title_text
+            mapbox_style="open-street-map", hover_name=hover_name, hover_data=hover_data
         )
         fig.update_layout(mapbox_center={"lat": center_lat, "lon": center_lon})
     else:
         fig = px.scatter(
             df, x="longitude", y="latitude", color=color_col, size=color_col,
-            color_continuous_scale=CPCB_COLOR_SCALE, title=title_text
+            color_continuous_scale=CPCB_COLOR_SCALE
         )
 
     if hasattr(go, "Scattermap"):
         fig.add_trace(go.Scattermap(
             lat=[center_lat], lon=[center_lon], mode="markers+text",
-            marker=dict(size=14, color="#0EA5E9"), text=["📍 Current Location"], textposition="top center", showlegend=False
+            marker=dict(size=14, color="#0EA5E9"), text=["Current Location"], textposition="top center", showlegend=False
         ))
     elif hasattr(go, "Scattermapbox"):
         fig.add_trace(go.Scattermapbox(
             lat=[center_lat], lon=[center_lon], mode="markers+text",
-            marker=dict(size=14, color="#0EA5E9"), text=["📍 Current Location"], textposition="top center", showlegend=False
+            marker=dict(size=14, color="#0EA5E9"), text=["Current Location"], textposition="top center", showlegend=False
         ))
 
-    fig.update_layout(margin={"r":0,"t":40,"l":0,"b":0}, height=560, template="plotly_white")
+    fig.update_layout(
+        title=dict(text=title_text, y=0.96, x=0.01, xanchor="left", font=dict(size=13, color="#0F172A")),
+        margin={"r":0,"t":40,"l":0,"b":0}, height=560, template="plotly_white"
+    )
     return fig
 
 
@@ -705,11 +719,11 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
     if pos and "lat" in pos and "lon" in pos:
         current_lat = float(pos["lat"])
         current_lon = float(pos["lon"])
-        loc_badge = f"📍 GPS Active: ({current_lat:.4f}, {current_lon:.4f})"
+        loc_badge = f"GPS Active: ({current_lat:.4f}, {current_lon:.4f})"
     else:
         current_lat = DEFAULT_LAT
         current_lon = DEFAULT_LON
-        loc_badge = f"📍 Location Default: Delhi-NCR ({DEFAULT_LAT:.4f}, {DEFAULT_LON:.4f})"
+        loc_badge = f"Location Default: Delhi-NCR ({DEFAULT_LAT:.4f}, {DEFAULT_LON:.4f})"
 
     spatial_df, health_df = get_grid_around_location(current_lat, current_lon)
     mean_aqi = spatial_df["estimated_aqi"].mean()
@@ -750,7 +764,7 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
                 ], width=5)
             ]),
             html.Div(style=CARD_STYLE, children=[
-                html.H6("📊 Real-World State & UT Air Quality Benchmark Dataset", style={"fontWeight": "700", "fontSize": "13px", "marginBottom": "12px", "color": "#0F172A"}),
+                html.H6("Real-World State & UT Air Quality Benchmark Dataset", style={"fontWeight": "700", "fontSize": "13px", "marginBottom": "12px", "color": "#0F172A"}),
                 dbc.Table.from_dataframe(
                     filtered_states[["state", "capital", "estimated_aqi", "aqi_category", "pm25", "pm10", "no2", "so2", "o3", "aod_550", "driver"]].rename(columns={
                         "state": "State / UT", "capital": "Capital", "estimated_aqi": "Real AQI", "aqi_category": "CPCB Category",
@@ -778,7 +792,7 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
                 dcc.Graph(figure=fig_forecast)
             ]),
             html.Div(style=CARD_STYLE, children=[
-                html.H6("🏆 Multi-Model Forecasting Performance Evaluation Suite", style={"fontWeight": "700", "fontSize": "13px", "marginBottom": "12px", "color": "#0F172A"}),
+                html.H6("Multi-Model Forecasting Performance Evaluation Suite", style={"fontWeight": "700", "fontSize": "13px", "marginBottom": "12px", "color": "#0F172A"}),
                 dbc.Table.from_dataframe(model_bench_df, striped=True, bordered=True, hover=True, style={"fontSize": "12px"})
             ])
         ])
@@ -810,7 +824,7 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
         for feat in FEATURE_EXPLANABILITY_DICTIONARY:
             feature_cards.append(
                 dbc.Col([
-                    html.Div(style={"backgroundColor": "#FFFFFF", "border": "1px solid #E2E8F0", "borderLeft": f"4px solid {feat['color']}", "borderRadius": "4px", "padding": "12px", "marginBottom": "12px"}, children=[
+                    html.Div(style={"backgroundColor": "#FFFFFF", "border": "1px solid #CFD8DC", "borderLeft": f"4px solid {feat['color']}", "borderRadius": "4px", "padding": "12px", "marginBottom": "12px"}, children=[
                         html.Div([
                             html.Span(feat["name"], style={"fontWeight": "700", "fontSize": "13px", "color": "#0F172A"}),
                             dbc.Badge(feat["tag"], color="light", text_color="dark", style={"float": "right", "fontSize": "10px"})
@@ -836,7 +850,7 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
                 ], width=6)
             ]),
             html.Div(style=CARD_STYLE, children=[
-                html.H6("📘 Atmospheric Feature Mechanism & Explainability Guide", style={"fontWeight": "700", "fontSize": "13px", "marginBottom": "12px", "color": "#0F172A"}),
+                html.H6("Atmospheric Feature Mechanism & Explainability Guide", style={"fontWeight": "700", "fontSize": "13px", "marginBottom": "12px", "color": "#0F172A"}),
                 dbc.Row(feature_cards)
             ])
         ])
@@ -862,7 +876,7 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
                 ], width=7),
                 dbc.Col([
                     html.Div(style=CARD_STYLE, children=[
-                        html.H6("🔍 Live Region Inspector & WHO Health Panel", style={"fontWeight": "700", "color": "#0F172A"}),
+                        html.H6("Live Region Inspector & WHO Health Panel", style={"fontWeight": "700", "color": "#0F172A"}),
                         html.Div(style={"backgroundColor": c_style["bg"], "border": f"1px solid {c_style['border']}", "borderRadius": "4px", "padding": "12px", "marginBottom": "14px"}, children=[
                             dbc.Row([
                                 dbc.Col([
@@ -886,11 +900,11 @@ def render_tab_content(active_tab, pos, selected_layer, selected_state, severity
                             html.Div([html.Span("Satellite AOD (550nm): "), html.Strong(f"{s_row['aod_550']}")], style={"fontSize": "11px", "marginBottom": "10px"})
                         ]),
                         html.Div(style={"backgroundColor": "#F8FAFC", "border": "1px solid #E2E8F0", "borderRadius": "4px", "padding": "10px", "marginBottom": "10px"}, children=[
-                            html.Div("🔥 Primary Pollution Driver:", style={"fontWeight": "700", "fontSize": "11px", "color": "#0F172A"}),
+                            html.Div("Primary Pollution Driver:", style={"fontWeight": "700", "fontSize": "11px", "color": "#0F172A"}),
                             html.Div(s_row["driver"], style={"fontSize": "12px", "color": "#334155", "marginTop": "2px"})
                         ]),
                         html.Div(style={"backgroundColor": "#EFF6FF", "border": "1px solid #BFDBFE", "borderRadius": "4px", "padding": "10px"}, children=[
-                            html.Div("🏥 WHO Hyperlocal Health Advisory:", style={"fontWeight": "700", "fontSize": "11px", "color": "#1E40AF"}),
+                            html.Div("WHO Hyperlocal Health Advisory:", style={"fontWeight": "700", "fontSize": "11px", "color": "#1E40AF"}),
                             html.Div([
                                 html.Div("• Outdoor Exercise: Safe for outdoor activity" if s_row["estimated_aqi"] < 100 else "• Outdoor Exercise: Avoid physical exertion", style={"fontSize": "11px", "color": "#1E3A8A", "marginTop": "2px"}),
                                 html.Div("• Mask Advice: No mask required" if s_row["estimated_aqi"] < 100 else "• Mask Advice: Mandatory N95 Respirator", style={"fontSize": "11px", "color": "#1E3A8A", "marginTop": "1px"}),
