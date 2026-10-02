@@ -8,6 +8,7 @@ Structured according to CRISP-DM (Cross-Industry Standard Process for Data Minin
 5. Deployment & Hyperlocal Risk Assessment (~2.5km Grid & WHO Health Burden)
 
 Designed with clean, restrained, high data-to-ink ratio aesthetics (slate navy tones, zero visual slop/gradients/neon glow).
+All chart legends, modebars, and colorbars formatted with clean non-overlapping margins.
 """
 
 import os
@@ -403,12 +404,13 @@ app.layout = html.Div(
             dbc.Tabs(
                 id="app-tabs",
                 active_tab="map-tab",
+                style={"flexWrap": "nowrap", "overflowX": "auto"},
                 children=[
-                    dbc.Tab(label="🌐 CRISP-DM 1 & 2: Spatial Data & Benchmarks", tab_id="map-tab"),
-                    dbc.Tab(label="📈 CRISP-DM 3: Time-Series Forecasting & Models", tab_id="forecast-tab"),
-                    dbc.Tab(label="🔬 CRISP-DM 4: Distributions & Atmospheric Correlations", tab_id="correlations-tab"),
-                    dbc.Tab(label="🧠 CRISP-DM 5: SHAP Explainability & Remote Sensing", tab_id="explain-tab"),
-                    dbc.Tab(label="🏥 CRISP-DM 6: Deployment & Hyperlocal Risk", tab_id="grid-tab"),
+                    dbc.Tab(label="🌐 Phase 1 & 2: Spatial Map & Rankings", tab_id="map-tab"),
+                    dbc.Tab(label="📈 Phase 3: 72h Forecasts & Models", tab_id="forecast-tab"),
+                    dbc.Tab(label="🔬 Phase 4: Distributions & Correlations", tab_id="correlations-tab"),
+                    dbc.Tab(label="🧠 Phase 5: SHAP & Remote Sensing", tab_id="explain-tab"),
+                    dbc.Tab(label="🏥 Phase 6: Hyperlocal Grid & Health", tab_id="grid-tab"),
                 ]
             ),
             html.Br(),
@@ -463,7 +465,7 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
     if hasattr(go, "Scattermap"):
         fig.add_trace(go.Scattermap(
             lat=df_plot["latitude"], lon=df_plot["longitude"], mode="markers",
-            marker=dict(size=8, color="#0F172A", opacity=0.85), hoverinfo="text", hovertext=hover_text, name="State Capitals"
+            marker=dict(size=8, color="#0F172A", opacity=0.85), hoverinfo="text", hovertext=hover_text, showlegend=False
         ))
         if selected_state_name and selected_state_name in df_plot["state"].values:
             sel_row = df_plot[df_plot["state"] == selected_state_name].iloc[0]
@@ -471,12 +473,12 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             fig.add_trace(go.Scattermap(
                 lat=[sel_row["latitude"]], lon=[sel_row["longitude"]], mode="markers+text",
                 marker=dict(size=16, color="#0EA5E9"), text=[f"📍 {selected_state_name}: {val_str}"],
-                textposition="top center", hoverinfo="text", hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"], name="Selected State"
+                textposition="top center", hoverinfo="text", hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"], showlegend=False
             ))
     elif hasattr(go, "Scattermapbox"):
         fig.add_trace(go.Scattermapbox(
             lat=df_plot["latitude"], lon=df_plot["longitude"], mode="markers",
-            marker=dict(size=8, color="#0F172A", opacity=0.85), hoverinfo="text", hovertext=hover_text, name="State Capitals"
+            marker=dict(size=8, color="#0F172A", opacity=0.85), hoverinfo="text", hovertext=hover_text, showlegend=False
         ))
         if selected_state_name and selected_state_name in df_plot["state"].values:
             sel_row = df_plot[df_plot["state"] == selected_state_name].iloc[0]
@@ -484,10 +486,13 @@ def create_all_india_political_map(df_states, selected_layer="estimated_aqi", se
             fig.add_trace(go.Scattermapbox(
                 lat=[sel_row["latitude"]], lon=[sel_row["longitude"]], mode="markers+text",
                 marker=dict(size=16, color="#0EA5E9"), text=[f"📍 {selected_state_name}: {val_str}"],
-                textposition="top center", hoverinfo="text", hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"], name="Selected State"
+                textposition="top center", hoverinfo="text", hovertext=[f"📍 Selected State: {selected_state_name} ({val_str})"], showlegend=False
             ))
 
-    fig.update_layout(margin={"r":0,"t":40,"l":0,"b":0}, height=580, template="plotly_white")
+    fig.update_layout(
+        margin={"r":10,"t":40,"l":0,"b":0}, height=580, template="plotly_white",
+        coloraxis_colorbar=dict(title=dict(text=unit, side="top"), len=0.85)
+    )
     return fig
 
 
@@ -512,7 +517,7 @@ def create_state_ranking_bar_chart(df_states, selected_layer="estimated_aqi"):
         hover_data=["capital", "aqi_category", "driver"]
     )
     fig.add_vline(x=ref_val, line_dash="dash", line_color="#E11D48", annotation_text=ref_label, annotation_position="top right")
-    fig.update_layout(margin={"r":10,"t":40,"l":10,"b":10}, height=580, template="plotly_white", coloraxis_showscale=False)
+    fig.update_layout(margin={"r":40,"t":40,"l":10,"b":10}, height=580, template="plotly_white", coloraxis_showscale=False)
     return fig
 
 
@@ -536,7 +541,8 @@ def create_forecast_figure(horizon_hours=72, mean_aqi=128.4):
     fig.update_layout(
         title=f"{horizon_hours}-Hour Ahead Multi-Model Forecast vs Ground Truth (with 95% Confidence Interval)",
         xaxis_title="Timeline (UTC)", yaxis_title="AQI Concentration Index",
-        template="plotly_white", height=420, legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        template="plotly_white", height=420, margin={"t":45,"b":20,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     return fig
 
@@ -546,10 +552,13 @@ def create_pollutant_box_plot(df_states):
     fig = px.box(
         df_melted, x="pollutant", y="concentration", color="aqi_category",
         title="Multi-Pollutant Concentration Distribution Across CPCB Risk Categories",
-        labels={"concentration": "Concentration Value", "pollutant": "Pollutant Metric", "aqi_category": "CPCB Risk Category"},
+        labels={"concentration": "Concentration Value", "pollutant": "Pollutant Metric", "aqi_category": "Category"},
         category_orders={"aqi_category": ["Good", "Satisfactory", "Moderate", "Poor", "Very Poor"]}
     )
-    fig.update_layout(template="plotly_white", height=440, margin={"t":40,"b":20})
+    fig.update_layout(
+        template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=dict(text="Risk Category:"))
+    )
     return fig
 
 
@@ -570,7 +579,7 @@ def create_correlation_heatmap():
         corr_matrix, text_auto=".2f", color_continuous_scale="RdBu_r", zmin=-1, zmax=1,
         title="Atmospheric & Satellite Covariate Pearson Correlation Heatmap"
     )
-    fig.update_layout(template="plotly_white", height=440, margin={"t":40,"b":20})
+    fig.update_layout(template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20})
     return fig
 
 
@@ -585,21 +594,28 @@ def create_shap_importance_chart():
         shap_df, x="shap_importance", y="feature", orientation="h", color="direction",
         color_discrete_map={"Positive (+)": "#E11D48", "Negative (-)": "#10B981"},
         title="SHAP Feature Importance & Contribution Ranking (%)",
-        labels={"shap_importance": "Mean Absolute SHAP Impact (%)", "feature": "Feature Variable"}
+        labels={"shap_importance": "Mean Absolute SHAP Impact (%)", "feature": "Feature Variable", "direction": "Effect Direction"}
     )
-    fig.update_layout(template="plotly_white", height=440, margin={"t":40,"b":20})
+    fig.update_layout(
+        template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=dict(text="Effect Direction:"))
+    )
     return fig
 
 
 def create_aod_calibration_scatter(df_states):
     fig = px.scatter(
         df_states, x="aod_550", y="pm25", color="aqi_category", size="estimated_aqi",
-        hover_name="state", text="state", color_continuous_scale=CPCB_COLOR_SCALE,
-        title="Spaceborne Satellite AOD (550nm) vs Ground PM2.5 Surface Monitor Calibration",
-        labels={"aod_550": "Satellite AOD (550nm)", "pm25": "Ground PM2.5 (µg/m³)"}
+        hover_name="state", hover_data=["capital", "estimated_aqi", "aqi_category"],
+        color_continuous_scale=CPCB_COLOR_SCALE,
+        title="Satellite AOD (550nm) vs Ground PM2.5 Calibration",
+        labels={"aod_550": "Satellite AOD (550nm)", "pm25": "Ground PM2.5 (µg/m³)", "aqi_category": "Category"}
     )
     fig.add_shape(type="line", x0=0.1, y0=20, x1=0.9, y1=200, line=dict(color="#64748B", width=1.5, dash="dash"))
-    fig.update_layout(template="plotly_white", height=440, margin={"t":40,"b":20})
+    fig.update_layout(
+        template="plotly_white", height=440, margin={"t":45,"b":20,"r":20,"l":20},
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=dict(text="Risk Category:"))
+    )
     return fig
 
 
@@ -627,12 +643,12 @@ def create_political_regional_map(df, center_lat, center_lon, color_col, title_t
     if hasattr(go, "Scattermap"):
         fig.add_trace(go.Scattermap(
             lat=[center_lat], lon=[center_lon], mode="markers+text",
-            marker=dict(size=14, color="#0EA5E9"), text=["📍 Current Location"], textposition="top center", name="You are here"
+            marker=dict(size=14, color="#0EA5E9"), text=["📍 Current Location"], textposition="top center", showlegend=False
         ))
     elif hasattr(go, "Scattermapbox"):
         fig.add_trace(go.Scattermapbox(
             lat=[center_lat], lon=[center_lon], mode="markers+text",
-            marker=dict(size=14, color="#0EA5E9"), text=["📍 Current Location"], textposition="top center", name="You are here"
+            marker=dict(size=14, color="#0EA5E9"), text=["📍 Current Location"], textposition="top center", showlegend=False
         ))
 
     fig.update_layout(margin={"r":0,"t":40,"l":0,"b":0}, height=560, template="plotly_white")
